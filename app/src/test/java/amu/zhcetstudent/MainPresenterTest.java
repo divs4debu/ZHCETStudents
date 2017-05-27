@@ -10,7 +10,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import amu.zhcetstudent.contract.model.ResultRepository;
+import amu.zhcetstudent.contract.model.ResultRepositoryModel;
 import amu.zhcetstudent.contract.presenter.MainPresenter;
 import amu.zhcetstudent.contract.view.MainView;
 import amu.zhcetstudent.data.model.Result;
@@ -23,7 +23,7 @@ import io.reactivex.schedulers.Schedulers;
 public class MainPresenterTest {
 
     @Mock
-    ResultRepository resultRepository;
+    ResultRepositoryModel resultRepositoryModel;
 
     @Mock
     MainView mainView;
@@ -35,7 +35,7 @@ public class MainPresenterTest {
 
     @Before
     public void setUp() {
-        mainPresenter = new MainActivityPresenter(mainView, resultRepository);
+        mainPresenter = new MainActivityPresenter(mainView, resultRepositoryModel);
         RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());
         RxAndroidPlugins.setInitMainThreadSchedulerHandler(schedulerCallable -> Schedulers.trampoline());
     }
@@ -43,32 +43,32 @@ public class MainPresenterTest {
     public void shouldShowResults() {
         Result testResult = new Result("14PEB049", "GF1032");
 
-        Mockito.when(resultRepository
+        Mockito.when(resultRepositoryModel
                 .getResult("14PEB049", "GF1032"))
                 .thenReturn(Observable.just(testResult));
 
         mainPresenter.loadResult("14PEB049", "GF1032");
 
-        InOrder inOrder = Mockito.inOrder(mainView, resultRepository);
+        InOrder inOrder = Mockito.inOrder(mainView, resultRepositoryModel);
 
         inOrder.verify(mainView).showProgress(true);
-        inOrder.verify(resultRepository).getResult("14PEB049", "GF1032");
+        inOrder.verify(resultRepositoryModel).getResult("14PEB049", "GF1032");
         inOrder.verify(mainView).showResult(testResult);
         inOrder.verify(mainView).showProgress(false);
     }
 
     @Test
     public void shouldShowError() {
-        Mockito.when(resultRepository
+        Mockito.when(resultRepositoryModel
                 .getResult("14PEB049", "GF1032"))
                 .thenReturn(Observable.error(new RuntimeException()));
 
         mainPresenter.loadResult("14PEB049", "GF1032");
 
-        InOrder inOrder = Mockito.inOrder(mainView, resultRepository);
+        InOrder inOrder = Mockito.inOrder(mainView, resultRepositoryModel);
 
         inOrder.verify(mainView).showProgress(true);
-        inOrder.verify(resultRepository).getResult("14PEB049", "GF1032");
+        inOrder.verify(resultRepositoryModel).getResult("14PEB049", "GF1032");
         inOrder.verify(mainView).showError(Mockito.anyString());
         inOrder.verify(mainView).showProgress(false);
     }
@@ -78,7 +78,7 @@ public class MainPresenterTest {
         Result result = new Result("14peb250", "gh0022");
         result.setError(true);
         result.setMessage("Wrong Credential");
-        Mockito.when(resultRepository
+        Mockito.when(resultRepositoryModel
                 .getResult("14peb250", "gh0022"))
                 .thenReturn(Observable.just(result));
         mainPresenter.loadResult("14peb250", "gh0022");

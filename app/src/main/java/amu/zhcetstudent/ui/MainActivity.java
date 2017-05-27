@@ -9,15 +9,23 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import java.io.LineNumberInputStream;
+
 import amu.zhcetstudent.R;
 import amu.zhcetstudent.contract.presenter.MainPresenter;
 import amu.zhcetstudent.contract.view.MainView;
 import amu.zhcetstudent.data.model.Result;
+import amu.zhcetstudent.data.model.ResultRepository;
+import amu.zhcetstudent.data.model.Subject;
 import amu.zhcetstudent.databinding.ActivityMainBinding;
+import amu.zhcetstudent.ui.Adapter.SubjectAdapter;
 import amu.zhcetstudent.ui.presenter.MainActivityPresenter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,8 +45,12 @@ public class MainActivity extends AppCompatActivity
 
     @BindView(R.id.nav_view)
     NavigationView navigationView;
+
+    @BindView(R.id.result)
+    RecyclerView recyclerView;
     private Unbinder unbinder;
     private View root;
+    private SubjectAdapter subjectAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +70,11 @@ public class MainActivity extends AppCompatActivity
 
         navigationView.setNavigationItemSelectedListener(this);
 
-        MainPresenter mainPresenter = new MainActivityPresenter(this, null);
+        MainPresenter mainPresenter = new MainActivityPresenter(this, new ResultRepository());
+        subjectAdapter = new SubjectAdapter();
+        recyclerView.setAdapter(subjectAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mainPresenter.loadResult("14peb250", "gh0022");
     }
 
     @Override
@@ -123,7 +139,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void showResult(Result result) {
-
+        this.subjectAdapter.addAllSubjects(result.getResults());
     }
 
     @Override

@@ -9,5 +9,4 @@ public interface MainView {
     void showError(String error);
 
     void showProgress(boolean show);
-
 }
